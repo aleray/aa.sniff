@@ -87,15 +87,33 @@ class AAApp(object):
     """
     def __init__(self, conf=conf):
         self.conf = conf
+        self.ident = rdflib.URIRef("rdflib_test")
+
+        engine = conf.STORE.get('ENGINE').lower()
+
+        if engine in ('sqlite', 'pgsql', 'mysql'):
+            print("using SQLAlchemy")
+            store = rdflib.plugin.get("SQLAlchemy", rdflib.store.Store)(identifier=self.ident)
+
+            if engine == 'sqlite':
+                uri = rdflib.Literal('{ENGINE}:///{NAME}'.format(**conf.STORE))
+            else:
+                uri = rdflib.Literal('{ENGINE}://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}'.format(**conf.STORE))
+        elif engine == "sleepycat":
+            print("using Sleepycat")
+            store = rdflib.plugin.get("Sleepycat", rdflib.store.Store)(identifier=self.ident)
+            uri = rdflib.Literal(conf.STORE.get('NAME'))
+        else:
+            print('invalid engine')
 
         # Open previously created store, or create it if it doesn't exist yet
-        self.graph = rdflib.ConjunctiveGraph('Sleepycat')
+        self.graph = rdflib.ConjunctiveGraph(store)
 
-        rt = self.graph.open(self.conf.store, create=False)
+        rt = self.graph.open(uri, create=False)
 
-        if rt == NO_STORE:
-            # There is no underlying Sleepycat infrastructure, create it
-            self.graph.open(self.conf.store, create=True)
+        if rt != VALID_STORE:
+            # There is no underlying infrastructure, create it
+            self.graph.open(uri, create=True)
         else:
             assert rt == VALID_STORE, 'The underlying store is corrupt'
 
