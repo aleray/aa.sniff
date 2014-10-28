@@ -126,7 +126,7 @@ class AAApp(object):
         request = requests.get(url, stream=True)
 
         # Indexes the content with the appropriate agents (sniffers)
-        for sniffer in self.conf.sniffers:
+        for sniffer in self.conf.SNIFFERS:
             sniffer = registry[sniffer](request=request, model=graph)
             result = sniffer.sniff() if sniffer.test() else None
 
@@ -139,12 +139,15 @@ class AAApp(object):
                         g.add(statement)
                 else:
                     # The sniffer returned a parsable string, such as XML+RDF, HTML+RDFa...
-                    g.parse(data=result, source=url, format=sniffer.syntax)
+                    #g.parse(data=result, source=url, format=sniffer.syntax)
+                    # Fixme: find a way to specify the context
+                    g.parse(data=result, format=sniffer.syntax)
 
-        for ctx in graph.contexts():
-            # Removes exisiting statements
-            gg = rdflib.graph.Graph(store=self.graph.store, identifier=ctx.identifier)
-            self.graph.remove_context(gg)
+        # FIXME: does not work as expected
+        #for ctx in graph.contexts():
+            ## Removes exisiting statements
+            #gg = rdflib.graph.Graph(store=self.graph.store, identifier=ctx.identifier)
+            #self.graph.remove_context(gg)
 
         for quad in graph.quads():
             # Adds the new statements

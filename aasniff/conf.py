@@ -16,7 +16,7 @@ sniffers = [
 #}
 
 STORE = {
-    'ENGINE': 'Sqlite',
+    'ENGINE': 'sqlite',
     'NAME': '/tmp/bar.db',
 }
 
