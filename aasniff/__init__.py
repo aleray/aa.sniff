@@ -22,7 +22,6 @@ import html5lib
 import os
 import rdflib
 import requests
-import importlib
 from . import conf
 
 
