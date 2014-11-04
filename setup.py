@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='aasniff',
-    version='0.1.0',
+    version='0.1.1',
     author='The active archives contributors',
     author_email='alexandre@stdin.fr',
     description=('Active Archives inverts the paradigm of uploading resources',

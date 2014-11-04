@@ -158,6 +158,7 @@ class AAApp(object):
 from sniffers.http import HttpSniffer
 from sniffers.feed import FeedSniffer
 from sniffers.html import HtmlSniffer
+from sniffers.html import TurtleSniffer
 from sniffers.image import ImageSniffer
 from sniffers.ogg import OggSniffer
 from sniffers.rdf import RDFSniffer
