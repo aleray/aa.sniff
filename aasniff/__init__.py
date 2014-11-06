@@ -137,12 +137,16 @@ class AAApp(object):
                     for statement in result:
                         g.add(statement)
                 else:
+                    # The sniffer generated statements; record the statements and where they come from
+                    g = rdflib.graph.Graph(store=store, identifier=rdflib.URIRef(request.url))
                     # The sniffer returned a parsable string, such as XML+RDF, HTML+RDFa...
                     #g.parse(data=result, source=url, format=sniffer.syntax)
                     # Fixme: find a way to specify the context
                     g.parse(data=result, format=sniffer.syntax)
 
-        # FIXME: does not work as expected
+        # FIXME: does not work as expected for non-direct input: it removes all
+        # the statements associated to a context. Since this context is
+        # usually a URI associated to the resource, it removes more than it should.
         #for ctx in graph.contexts():
             ## Removes exisiting statements
             #gg = rdflib.graph.Graph(store=self.graph.store, identifier=ctx.identifier)
