@@ -3,7 +3,6 @@ SNIFFERS = [
     'HtmlSniffer',
     'RDFSniffer',
     'TurtleSniffer',
-    'FeedSniffer',
     'ImageSniffer',
     'OggSniffer',
     'WavSniffer',

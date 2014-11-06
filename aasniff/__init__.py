@@ -160,7 +160,6 @@ class AAApp(object):
 
 
 from sniffers.http import HttpSniffer
-from sniffers.feed import FeedSniffer
 from sniffers.html import HtmlSniffer
 from sniffers.turtle import TurtleSniffer
 from sniffers.image import ImageSniffer
