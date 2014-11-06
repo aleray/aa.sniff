@@ -1,8 +1,8 @@
-store = '/tmp/test'
-sniffers = [
+SNIFFERS = [
     'HttpSniffer',
     'HtmlSniffer',
     'RDFSniffer',
+    'TurtleSniffer',
     'FeedSniffer',
     'ImageSniffer',
     'OggSniffer',
