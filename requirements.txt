@@ -1,0 +1,5 @@
+rdflib>=4
+html5lib
+requests>=1
+python-magic
+rdflib-sqlalchemy
