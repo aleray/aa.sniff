@@ -16,13 +16,16 @@
 # Also add information on how to contact you by electronic and paper mail.
 
 
-from rdflib.store import NO_STORE, VALID_STORE
+from rdflib.store import VALID_STORE
 from rdflib.plugins.memory import IOMemory
 import html5lib
-import os
 import rdflib
 import requests
+import logging
 from . import conf
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 registry = {}
@@ -42,7 +45,7 @@ def tidy(method):
             parser = html5lib.HTMLParser(tree=html5lib.treebuilders.getTreeBuilder("dom"))
             dom = parser.parse(string)
 
-            ## FIXME: remove this? we moved to rdflib
+            # FIXME: remove this? we moved to rdflib
             # Redland crashes if no xmlns attribute is declared.
             # see: http://bugs.librdf.org/mantis/view.php?id=521
             # Lets fix it in the meanwhile...
@@ -91,30 +94,31 @@ class AAApp(object):
         engine = conf.STORE.get('ENGINE').lower()
 
         if engine in ('sqlite', 'pgsql', 'mysql'):
-            print("using SQLAlchemy")
-            store = rdflib.plugin.get("SQLAlchemy", rdflib.store.Store)(identifier=self.ident)
+            logging.info("using SQLAlchemy")
+
+            # Fixes issue <https://github.com/RDFLib/rdflib-sqlalchemy/issues/31>
+            try:
+                store = rdflib.plugin.get("SQLAlchemy", rdflib.store.Store)(identifier=self.ident)
+            except rdflib.plugin.PluginException:
+                rdflib.plugin.register("SQLAlchemy", rdflib.store.Store, "rdflib_sqlalchemy.store", "SQLAlchemy")
+                store = rdflib.plugin.get("SQLAlchemy", rdflib.store.Store)(identifier=self.ident)
 
             if engine == 'sqlite':
                 uri = rdflib.Literal('{ENGINE}:///{NAME}'.format(**conf.STORE))
             else:
                 uri = rdflib.Literal('{ENGINE}://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}'.format(**conf.STORE))
         elif engine == "sleepycat":
-            print("using Sleepycat")
+            logging.info("using Sleepycat")
             store = rdflib.plugin.get("Sleepycat", rdflib.store.Store)(identifier=self.ident)
             uri = rdflib.Literal(conf.STORE.get('NAME'))
         else:
-            print('invalid engine')
+            logging.error('invalid engine')
 
         # Open previously created store, or create it if it doesn't exist yet
         self.graph = rdflib.ConjunctiveGraph(store)
 
-        rt = self.graph.open(uri, create=False)
-
-        if rt != VALID_STORE:
-            # There is no underlying infrastructure, create it
-            self.graph.open(uri, create=True)
-        else:
-            assert rt == VALID_STORE, 'The underlying store is corrupt'
+        rt = self.graph.open(uri, create=True)
+        assert rt == VALID_STORE, 'The underlying store is corrupt'
 
     def index(self, url):
         """
@@ -140,23 +144,23 @@ class AAApp(object):
                     # The sniffer generated statements; record the statements and where they come from
                     g = rdflib.graph.Graph(store=store, identifier=rdflib.URIRef(request.url))
                     # The sniffer returned a parsable string, such as XML+RDF, HTML+RDFa...
-                    #g.parse(data=result, source=url, format=sniffer.syntax)
+                    # g.parse(data=result, source=url, format=sniffer.syntax)
                     # Fixme: find a way to specify the context
                     g.parse(data=result, format=sniffer.syntax)
 
         # FIXME: does not work as expected for non-direct input: it removes all
         # the statements associated to a context. Since this context is
         # usually a URI associated to the resource, it removes more than it should.
-        #for ctx in graph.contexts():
-            ## Removes exisiting statements
-            #gg = rdflib.graph.Graph(store=self.graph.store, identifier=ctx.identifier)
-            #self.graph.remove_context(gg)
+        # for ctx in graph.contexts():
+            # # Removes exisiting statements
+            # gg = rdflib.graph.Graph(store=self.graph.store, identifier=ctx.identifier)
+            # self.graph.remove_context(gg)
 
         for quad in graph.quads():
             # Adds the new statements
             self.graph.add(quad)
 
-        #print(self.graph.serialize(format='nquads'))
+        # print(self.graph.serialize(format='nquads'))
 
 
 from sniffers.http import HttpSniffer
