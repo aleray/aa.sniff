@@ -25,7 +25,12 @@ import logging
 from . import conf
 
 
-logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter('[%(levelname)s] %(message)s')
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 
 registry = {}
@@ -94,7 +99,7 @@ class AAApp(object):
         engine = conf.STORE.get('ENGINE').lower()
 
         if engine in ('sqlite', 'pgsql', 'mysql'):
-            logging.info("using SQLAlchemy")
+            logger.info("using SQLAlchemy")
 
             # Fixes issue <https://github.com/RDFLib/rdflib-sqlalchemy/issues/31>
             try:
@@ -108,11 +113,11 @@ class AAApp(object):
             else:
                 uri = rdflib.Literal('{ENGINE}://{USER}:{PASSWORD}@{HOST}:{PORT}/{NAME}'.format(**conf.STORE))
         elif engine == "sleepycat":
-            logging.info("using Sleepycat")
+            logger.info("using Sleepycat")
             store = rdflib.plugin.get("Sleepycat", rdflib.store.Store)(identifier=self.ident)
             uri = rdflib.Literal(conf.STORE.get('NAME'))
         else:
-            logging.error('invalid engine')
+            logger.error('invalid engine')
 
         # Open previously created store, or create it if it doesn't exist yet
         self.graph = rdflib.ConjunctiveGraph(store)
