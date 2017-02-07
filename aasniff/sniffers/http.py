@@ -29,6 +29,6 @@ class HttpSniffer(AASniffer):
         triples = [(subject, DCT['format'], Literal(mime))]
 
         for key, value in self.request.headers.items():
-            triples.append((subject, HDR[key], Literal(value)))
+            triples.append((subject, HDR[key.lower()], Literal(value)))
 
         return triples
