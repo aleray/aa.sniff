@@ -5,8 +5,8 @@ from .. import sniffer, AASniffer
 try: import simplejson as json
 except ImportError: import json
 
-try: from cStringIO import StringIO
-except: from StringIO import StringIO
+try: from io import StringIO
+except: from io import StringIO
 
 from rdflib import Namespace, URIRef, Literal
 
@@ -30,7 +30,7 @@ class WavSniffer(AASniffer):
     def sniff(self):
         print("sniffed an wav file")
         request = requests.get(self.request.url, stream=True)
-        head = request.iter_content(1024).next()
+        head = next(request.iter_content(1024))
         output = StringIO(head)
         f = wave.open(output, 'r')
         duration = (1.0 * f.getnframes ()) / f.getframerate ()

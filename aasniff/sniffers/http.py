@@ -20,7 +20,7 @@ class HttpSniffer(AASniffer):
         # FIXME: there should be a way to avoid doing a second request.
         #        See <http://stackoverflow.com/questions/13197854/>
         request = requests.get(self.request.url, stream=True)
-        mime = magic.from_buffer(request.iter_content(1024).next(), mime=True)
+        mime = magic.from_buffer(next(request.iter_content(1024)), mime=True)
 
         DCT = Namespace('http://purl.org/dc/terms/')
         HDR = Namespace('http://www.w3.org/2011/http-headers#')
@@ -28,7 +28,7 @@ class HttpSniffer(AASniffer):
 
         triples = [(subject, DCT['format'], Literal(mime))]
 
-        for key, value in self.request.headers.items():
+        for key, value in list(self.request.headers.items()):
             triples.append((subject, HDR[key.lower()], Literal(value)))
 
         return triples

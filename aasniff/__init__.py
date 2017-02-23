@@ -90,7 +90,7 @@ class AASniffer(object):
 class AAApp(object):
     """
     >>> app = AAApp()
-    >>> app.index('https://openlibrary.org/authors/OL200810A.rdf')
+    >>> app.index('http://kavan.land/statements/zotero/zotero.rdf')
     """
     def __init__(self, conf=conf):
         self.conf = conf
@@ -168,11 +168,11 @@ class AAApp(object):
         # print(self.graph.serialize(format='nquads'))
 
 
-from sniffers.http import HttpSniffer
-from sniffers.html import HtmlSniffer
-from sniffers.turtle import TurtleSniffer
-from sniffers.image import ImageSniffer
-from sniffers.ogg import OggSniffer
-from sniffers.rdf import RDFSniffer
-from sniffers.wav import WavSniffer
-from sniffers.youtube import YoutubeSniffer
+from aasniff.sniffers.http import HttpSniffer
+from aasniff.sniffers.html import HtmlSniffer
+from aasniff.sniffers.turtle import TurtleSniffer
+from aasniff.sniffers.image import ImageSniffer
+from aasniff.sniffers.ogg import OggSniffer
+from aasniff.sniffers.rdf import RDFSniffer
+from aasniff.sniffers.wav import WavSniffer
+from aasniff.sniffers.youtube import YoutubeSniffer
